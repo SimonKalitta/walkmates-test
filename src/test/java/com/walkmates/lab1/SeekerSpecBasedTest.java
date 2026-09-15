@@ -1,6 +1,7 @@
 package com.walkmates.lab1;
 
 import com.walkmates.model.Seeker;
+import com.walkmates.model.TrustTier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -156,6 +157,7 @@ class SeekerSpecBasedTest {
         assertDoesNotThrow(() -> seeker.addFunds(5000.00));
     }
 
+    @Test
     @DisplayName("Just above upper top-up boundary reject")
     void justAboveUpperTopUpBoundaryReject() {
         Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
@@ -191,5 +193,47 @@ class SeekerSpecBasedTest {
         seeker.addFunds(5000.00);
         seeker.addFunds(4999.99);
         assertThrows(IllegalArgumentException.class, () -> seeker.addFunds(0000.02));
+    }
+
+    // ========== Decision table ==========
+
+    @Test
+    @DisplayName("NEW tier: max 1 concurrent booking, 15% platform fee")
+    void newTierLimits() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        assertThat(seeker.getTrustTier()).isEqualTo(TrustTier.NEW);
+        assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(1);
+        assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.15);
+    }
+
+    @Test
+    @DisplayName("VERIFIED tier: max 3 concurrent bookings, 12% platform fee")
+    void verifiedTierLimits() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        seeker.setTrustTier(TrustTier.VERIFIED);
+        assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(3);
+        assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.12);
+    }
+
+    @Test
+    @DisplayName("TRUSTED tier: max 5 concurrent bookings, 8% platform fee")
+    void trustedTierLimits() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        seeker.setTrustTier(TrustTier.TRUSTED);
+        assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(5);
+        assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.08);
+    }
+
+    @Test
+    @DisplayName("PRO_SITTER tier: max 10 concurrent bookings, 5% platform fee")
+    void proSitterTierLimits() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        seeker.setTrustTier(TrustTier.PRO_SITTER);
+        assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(10);
+        assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.05);
     }
 }
