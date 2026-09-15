@@ -118,4 +118,78 @@ class SeekerSpecBasedTest {
         assertThrows(IllegalArgumentException.class,
                 () -> seeker.addFunds(4000.00));
     }
+
+    // ========== BVA ==========
+
+    @Test
+    @DisplayName("Just below lower top-up boundary reject")
+    void justBelowTopUpBoundaryReject() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        assertThrows(IllegalArgumentException.class, () -> seeker.addFunds(9.99));
+    }
+
+    @Test
+    @DisplayName("Lower top-up boundary accept")
+    void lowerTopUpBoundaryAccept() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        assertDoesNotThrow(() -> seeker.addFunds(10.00));
+    }
+
+    @Test
+    @DisplayName("Just above lower top-up boundary accept")
+    void justAboveLowerTopUpBoundaryAccept() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        assertDoesNotThrow(() -> seeker.addFunds(10.01));
+    }
+
+    @Test
+    @DisplayName("Just below upper top-up boundary accept")
+    void justBelowUpperTopUpBoundaryAccept() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        assertDoesNotThrow(() -> seeker.addFunds(4999.99));
+    }
+
+    @Test
+    @DisplayName("Upper top-up boundary accept")
+    void upperTopUpBoundaryAccept() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        assertDoesNotThrow(() -> seeker.addFunds(5000.00));
+    }
+
+    @DisplayName("Just above upper top-up boundary reject")
+    void justAboveUpperTopUpBoundaryReject() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        assertThrows(IllegalArgumentException.class, () -> seeker.addFunds(5000.01));
+    }
+
+    @Test
+    @DisplayName("Just below maximum balance accept")
+    void justBelowMaximumBalanceAccept() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        assertDoesNotThrow(() -> seeker.addFunds(4999.99));
+    }
+
+    @Test
+    @DisplayName("Maximum balance accept")
+    void maximumBalanceAccept() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        assertDoesNotThrow(() -> seeker.addFunds(5000.00));
+    }
+
+    @Test
+    @DisplayName("Just above maximum balance reject")
+    void justAboveMaximumBalanceReject() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(4999.99);
+        assertThrows(IllegalArgumentException.class, () -> seeker.addFunds(0000.02));
+    }
 }
