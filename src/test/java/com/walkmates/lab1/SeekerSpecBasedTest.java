@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -33,10 +34,88 @@ class SeekerSpecBasedTest {
     // TODO (Decision table): expected fee + max-bookings for each trust tier (FR-1.2).
 
     @Test
-    @DisplayName("TODO: replace me — invalid email is rejected at registration")
-    void invalidEmailIsRejected() {
-        // Example of the shape; expand into your full EP set.
+    @DisplayName("More than one @ in email is rejected at registration")
+    void invalidAtInEmailIsRejectedAtRegistration() {
         assertThrows(IllegalArgumentException.class,
-                () -> new Seeker("not-an-email", "Sam", "0707654321"));
+                () -> new Seeker("example@example@example.domain.com", "Sam", "0707654321"));
+    }
+
+    @Test
+    @DisplayName("Correct local part in email is accepted at registration")
+    void validLocalPartIsAcceptedAtRegistration() {
+        assertDoesNotThrow(() -> new Seeker("example@domain.com", "Sam", "0707654321"));
+    }
+
+    @Test
+    @DisplayName("Correct dot in email is accepted at registration")
+    void validDotInEmailIsAcceptedAtRegistration() {
+        assertDoesNotThrow(() -> new Seeker("example@domain.com", "Sam", "0707654321"));
+    }
+
+    @Test
+    @DisplayName("Incorrect email length in email is rejected at registration")
+    void invalidEmailLengthIsRejectedAtRegistration() {
+        String longEmail = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz012345678912@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789.com";
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker(longEmail, "Sam", "0707654321"));
+    }
+
+    @Test
+    @DisplayName("Incorrect display name length is rejected at registration")
+    void invalidDisplayNameLengthAtRegistration() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker("example@domain.com", "Alexander_The_Great_ conqueror_Of_Worlds89", "0707654321"));
+    }
+
+    @Test
+    @DisplayName("Special characters in display name is rejected at registration")
+    void specialCharactersInDisplayNameIsRejectedAtRegistration() {
+        String bestName = "Sergio <3";
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker("example@domain.com", bestName, "0707654321"));
+    }
+
+    @Test
+    @DisplayName("Correct 07 phone number length is accepted at registration")
+    void valid07PhoneNumberLengthIsAcceptedAtRegistration() {
+        assertDoesNotThrow(() -> new Seeker("example@domain.com", "Sam", "0712345678"));
+    }
+
+    @Test
+    @DisplayName("Correct international phone number length is accepted at registration")
+    void validInternationalPhoneNumberLengthIsAcceptedAtRegistration() {
+        assertDoesNotThrow(() -> new Seeker("example@domain.com", "Sam", "+46723456789"));
+    }
+
+    @Test
+    @DisplayName("No special characters in 07 phone number is accepted at registration")
+    void noSpecialCharactersIn07PhoneNumberIsAcceptedAtRegistration() {
+        assertDoesNotThrow(() -> new Seeker("example@domain.com", "Sam", "0712345678"));
+    }
+
+    @Test
+    @DisplayName("No special characters in international phone number is accepted at registration")
+    void noSpecialCharactersInInternationalPhoneNumberIsAcceptedAtRegistration() {
+        assertDoesNotThrow(() -> new Seeker("example@domain.com", "Sam", "+46723456789"));
+    }
+
+    @Test
+    @DisplayName("Invalid top-up amount is rejected")
+    void invalidTopUpAmountIsRejected() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        assertThrows(IllegalArgumentException.class,
+                () -> seeker.addFunds(5000.01));
+    }
+
+    @Test
+    @DisplayName("Invalid resulting balance amount is rejected")
+    void invalidResultingBalanceAmountIsRejected() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(2000.00);
+        assertThrows(IllegalArgumentException.class,
+                () -> seeker.addFunds(4000.00));
     }
 }
