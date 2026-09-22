@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -237,6 +238,15 @@ class SeekerSpecBasedTest {
         seeker.setTrustTier(TrustTier.PRO_SITTER);
         assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(10);
         assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.05);
+    }
+
+    @Test
+    @DisplayName("Test seeker email getter")
+    void testSeekerEmailGetter() {
+        String email = "example@mail.com";
+        Seeker seeker = new Seeker(email, "Sam", "0712345678");
+
+        assertEquals(email, seeker.getEmail());
     }
 
     @Test
