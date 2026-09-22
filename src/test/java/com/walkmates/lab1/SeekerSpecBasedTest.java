@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Lab 1, Part B — specification-based tests for {@link Seeker}.
@@ -235,5 +237,56 @@ class SeekerSpecBasedTest {
         seeker.setTrustTier(TrustTier.PRO_SITTER);
         assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(10);
         assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.05);
+    }
+
+    @Test
+    @DisplayName("Seeker ID getter returns ID")
+    void seekerIDGetter() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        String id = seeker.getId();
+        assertFalse(id.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Seeker display name getter returns correct name")
+    void seekerDisplayNameGetter() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        String displayName = seeker.getDisplayName();
+        assertEquals("Sam",  displayName);
+    }
+
+    @Test
+    @DisplayName("Seeker phone number getter returns correct number")
+    void seekerPhoneNumberGetter() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        String phoneNumber = seeker.getPhoneNumber();
+        assertEquals("0712345678",  phoneNumber);
+    }
+
+    @Test
+    @DisplayName("Set trust tier not null")
+    void setTrustTierNull() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        assertThrows(IllegalArgumentException.class, () -> seeker.setTrustTier(null));
+    }
+
+    @Test
+    @DisplayName("Charge negative")
+    void chargeNegative() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        assertThrows(IllegalArgumentException.class, () -> seeker.charge(-1));
+    }
+
+    @Test
+    @DisplayName("Charge more than balance in wallet")
+    void chargeMoreThanBalanceInWallet() {
+        Seeker seeker = new Seeker("example@domain.com", "Sam", "0712345678");
+
+        assertThrows(IllegalArgumentException.class, () -> seeker.charge(10));
     }
 }
