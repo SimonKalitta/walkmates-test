@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.time.LocalDate;
 
 /** REST surface for listings and bookings (used by the demo UI and available for testing). */
 @RestController
@@ -37,7 +38,8 @@ public class BookingController {
     @PostMapping("/api/bookings")
     public ResponseEntity<BookingView> create(@RequestBody CreateBookingRequest request) {
         Booking booking = bookingService.createBooking(
-                request.seekerId(), request.listingId(), request.durationMinutes());
+                request.seekerId(), request.listingId(), request.durationMinutes(),
+                request.scheduledStartDate());
         BookingView view = new BookingView(booking.getId(), booking.getStatus().name(), booking.getPrice());
         return ResponseEntity.status(HttpStatus.CREATED).body(view);
     }
@@ -55,7 +57,8 @@ public class BookingController {
     public record ListingView(String id, String title, String type, double rate, String status) {
     }
 
-    public record CreateBookingRequest(String seekerId, String listingId, int durationMinutes) {
+    public record CreateBookingRequest(String seekerId, String listingId, int durationMinutes,
+                                       LocalDate scheduledStartDate) {
     }
 
     public record BookingView(String id, String status, double price) {

@@ -1,6 +1,7 @@
 package com.walkmates.model;
 
 import java.util.UUID;
+import java.time.LocalDate;
 
 /**
  * A Booking is a Seeker's reservation of a {@link Listing} (see REQUIREMENTS FR-4).
@@ -17,6 +18,7 @@ public class Booking {
     private final String seekerId;
     private final String listingId;
     private final int durationMinutes;
+    private final LocalDate scheduledStartDate;
     private BookingStatus status;
     private double price;
 
@@ -29,6 +31,16 @@ public class Booking {
      * @throws IllegalArgumentException if the duration is out of range
      */
     public Booking(String seekerId, String listingId, int durationMinutes) {
+        this(seekerId, listingId, durationMinutes, null);
+    }
+
+    /**
+     * Creates a request with a scheduled calendar date at the service location.
+     * A null date preserves legacy unscheduled pricing (no weekend surcharge).
+     * The date is supplied by the caller, never inferred from the system clock.
+     */
+    public Booking(String seekerId, String listingId, int durationMinutes,
+                   LocalDate scheduledStartDate) {
         if (seekerId == null || seekerId.isBlank()) {
             throw new IllegalArgumentException("Booking requires a seeker");
         }
@@ -44,6 +56,7 @@ public class Booking {
         this.seekerId = seekerId;
         this.listingId = listingId;
         this.durationMinutes = durationMinutes;
+        this.scheduledStartDate = scheduledStartDate;
         this.status = BookingStatus.REQUESTED;
         this.price = 0.0;
     }
@@ -62,6 +75,10 @@ public class Booking {
 
     public int getDurationMinutes() {
         return durationMinutes;
+    }
+
+    public LocalDate getScheduledStartDate() {
+        return scheduledStartDate;
     }
 
     public BookingStatus getStatus() {

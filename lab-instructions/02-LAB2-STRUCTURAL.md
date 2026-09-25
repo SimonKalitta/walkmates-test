@@ -85,8 +85,10 @@ either put the `SeekerService.topUp` cases there in a clearly named nested class
 separate `SeekerServiceTest.java`; both layouts are acceptable.
 
 ### Activity 4.3 — Regression selection
-A change is proposed on the branch/diff `feature/weekend-surcharge` (see the instructor's change
-scenario, or simulate one by editing `PricingCalculator`). Given the change, **select and
+A change is proposed on the [`feature/weekend-surcharge` branch](https://github.com/sergiorico/walkmates-test/tree/feature/weekend-surcharge).
+Read the [instructor's change scenario](https://github.com/sergiorico/walkmates-test/blob/feature/weekend-surcharge/docs/WEEKEND_SURCHARGE_SCENARIO.md)
+for the pricing rules, baseline commit and commands to inspect the diff without changing
+your working files. Given the change, **select and
 prioritize** which existing tests must re-run and justify the order. Which tests are
 change-relevant, and which are wasteful to run every time?
 

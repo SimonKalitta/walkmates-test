@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 
 /**
  * Computes the price of a {@link Booking} per REQUIREMENTS FR-4.3.
@@ -21,6 +23,7 @@ public class PricingCalculator {
 
     private static final double OVERNIGHT_THRESHOLD_MINUTES = 480; // 8 hours
     private static final double OVERNIGHT_SURCHARGE_RATE = 0.20;
+    private static final double WEEKEND_SURCHARGE_RATE = 0.10;
 
     /**
      * Calculates the total price for a booking.
@@ -50,7 +53,12 @@ public class PricingCalculator {
             overnightExtra = baseCost * OVERNIGHT_SURCHARGE_RATE;
         }
 
-        double subtotal = baseCost + overnightExtra;
+        LocalDate startDate = booking.getScheduledStartDate();
+        boolean weekend = startDate != null
+                && (startDate.getDayOfWeek() == DayOfWeek.SATURDAY
+                    || startDate.getDayOfWeek() == DayOfWeek.SUNDAY);
+        double weekendExtra = weekend ? baseCost * WEEKEND_SURCHARGE_RATE : 0.0;
+        double subtotal = baseCost + overnightExtra + weekendExtra;
         double fee = subtotal * seeker.getTrustTier().getPlatformFee();
         return round2(subtotal + fee);
     }

@@ -1,5 +1,10 @@
 # WalkMates 🐾
 
+> **Activity 4.3 feature branch:** read the
+> [weekend-surcharge change scenario](docs/WEEKEND_SURCHARGE_SCENARIO.md).
+> This proposed change is for regression-selection analysis. The frozen lab baseline is
+> commit `072e167`; you do not need to merge this branch into your lab work.
+
 ![Made for Mid Sweden University — DV033G](https://img.shields.io/badge/Mid%20Sweden%20University-DV033G-blue.svg)
 
 A teaching system for **Principles & Practices in Software Testing (DV033G)**, HT26. WalkMates

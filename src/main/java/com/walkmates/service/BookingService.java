@@ -11,6 +11,7 @@ import com.walkmates.repository.ListingRepository;
 import com.walkmates.repository.ProviderRepository;
 import com.walkmates.repository.SeekerRepository;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 
 /**
  * Orchestrates booking creation and lifecycle per REQUIREMENTS FR-4.
@@ -53,6 +54,12 @@ public class BookingService {
      * @return the confirmed booking
      */
     public Booking createBooking(String seekerId, String listingId, int durationMinutes) {
+        return createBooking(seekerId, listingId, durationMinutes, null);
+    }
+
+    /** Confirms a booking for the supplied local start date; null retains legacy pricing. */
+    public Booking createBooking(String seekerId, String listingId, int durationMinutes,
+                                 LocalDate scheduledStartDate) {
         Seeker seeker = seekers.findById(seekerId)
                 .orElseThrow(() -> new BookingRejectedException("Unknown seeker: " + seekerId));
         Listing listing = listings.findById(listingId)
@@ -64,7 +71,7 @@ public class BookingService {
         }
 
         // Rule 4: duration within range — constructed here so the range check (FR-4.1) runs.
-        Booking booking = new Booking(seekerId, listingId, durationMinutes);
+        Booking booking = new Booking(seekerId, listingId, durationMinutes, scheduledStartDate);
 
         // Rule 2: seeker's active bookings below the trust-tier max (FR-4.4 rule 2).
         long seekerActive = activeBookingCountForSeeker(seekerId);
