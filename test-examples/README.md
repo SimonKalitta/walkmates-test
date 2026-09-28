@@ -1,9 +1,22 @@
-# Unit testing, parameterization, and coverage
+# Teaching examples: unit tests, coverage and test doubles
 
 These runnable examples test the real [Pet](../src/main/java/com/walkmates/catalog/Pet.java)
 used by the provider catalog. Read this guide, then the comments in
 [PetTest.java](PetTest.java) and [PetCoverageTest.java](PetCoverageTest.java).
 No slides or external companion files are needed. The examples are separate from the frozen lab tasks.
+
+For test doubles, continue with [Mockito examples](DOUBLES.md) and
+[SeekerDoublesTest.java](SeekerDoublesTest.java). The success and decline cases are partial
+worked examples for Activity 4.2; timeout and booking-notification tests remain student work.
+
+| File | Focus |
+|---|---|
+| `PetTest.java` | Unit testing and parameterised tests |
+| `PetCoverageTest.java` | Structural coverage and boundaries |
+| `SeekerDoublesTest.java` | Stubbing, interaction assertions, a working repository and a spy |
+
+Run all three classes with `mvn -Pexamples clean test`, or select one by name as below.
+There are no separate TDD or mutation-demo classes in this folder.
 
 ## Start here
 
@@ -17,7 +30,7 @@ mvn -Pexamples -Dtest=PetTest#renameStripsSurroundingWhitespace test
 ```
 
 The `examples` profile compiles the actual application but selects **only** `test-examples/`.
-Both Java files declare `com.walkmates.examples`; their flat source layout makes them easy to find.
+The Java files declare `com.walkmates.examples`; their flat source layout makes them easy to find.
 Results are in `target/examples/surefire-reports/`; coverage is in
 `target/examples/site/jacoco/index.html`.
 
@@ -180,6 +193,11 @@ These four feasible routes cover six branch outcomes across three conditional ch
 they do not prove every catalog rule or all combinations of edits.
 
 ## Validation and extension
+
+On 2026-09-28 the recent additions were reduced to Doubles only. The current folder contains
+18 PetTest, 10 PetCoverageTest and 6 SeekerDoublesTest invocations: all 34 pass on Java 21.0.11,
+as do the nine normal lab invocations. The new standalone mutation/TDD demos were removed;
+the earlier Pet coverage examples below remain unchanged.
 
 The suite has 18 PetTest and 10 PetCoverageTest invocations. The initial validation on
 2026-09-20 used Java 21.0.11: all 28 passed, as did all nine original lab invocations.
