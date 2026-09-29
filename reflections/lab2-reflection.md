@@ -9,21 +9,17 @@
 ---
 
 ### 1. What we did
-A few sentences: which tests/artifacts you produced and why those, against which requirements
-(cite rule IDs, e.g. FR-1.3, FR-4.4).
-
 We raised branch coverage to 100% for `PricingCalculator` by adding tests for shelter volunteer listings always should be free, overnight bookings should include a 20% surcharge, and bookings exactly 480 minutes shouldn't include the 20% surcharge (FR-4.3). The provided test already covered a non-overnight booking. 
 
 ### 2. What we found
-The most interesting thing you learned or uncovered — a boundary bug, a surviving mutant, a
-covered-but-buggy path, a fallback that didn't behave, a metamorphic relation that broke.
-
 When writing the test for bookings exactly 480 minutes, we notice that it failed and the expected result included the 20% surcharge when it shouldn't:
 ```
 AssertionFailedError: 
 expected: 716.8
 but was: 860.16
 ```
+
+The 600-minute overnight test triggered the surcharge line and together with the provided 60-minute test reached 100% branch coverage. Both tests produce the same result but only differ at exactly 480 minutes. Our boundary test at 480 minutes (from FR-4.3, "strictly greater than") failed against the provided code.
 
 When looking in the `PricingCalculator::priceFor` `if`-statement, we can see that it checks the provided minutes to be greater or equal to the `OVERNIGHT_THRESHOLD_MINUTES`.
 
