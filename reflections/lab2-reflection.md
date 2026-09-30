@@ -18,7 +18,7 @@ After:
 ![](2026-09-30_07-35-14.png)
 
 Mutation tests were also performed. We tested `BookingService` in isolation with Mockito mocks for the repositories and `NotificationService`, and verified the confirmation notification. First time running PIT we could see `PricingCalculator` already have its mutants killed by the existing tests. We looked at the PIT report for both `BookingService` and `SeekerService` and methodically killed the mutations util none were left:  
-![Bild på 100%]()
+![Bild på 100%](2026-09-30_13-50-44.png)
 
 ### 2. What we found
 When writing the test for bookings exactly 480 minutes, we notice that it failed and the expected result included the 20% surcharge when it shouldn't:
