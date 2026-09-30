@@ -11,11 +11,14 @@
 ### 1. What we did
 We raised branch coverage to 100% for `PricingCalculator` by adding tests for shelter volunteer listings always should be free, overnight bookings should include a 20% surcharge, and bookings exactly 480 minutes shouldn't include the 20% surcharge (FR-4.3). The provided test already covered a non-overnight booking. 
 
-Before:
+Before:  
 ![](2026-09-29_14-36-30.png)
 
-After:
+After:  
 ![](2026-09-30_07-35-14.png)
+
+Mutation tests were also performed. We tested `BookingService` in isolation with Mockito mocks for the repositories and `NotificationService`, and verified the confirmation notification. First time running PIT we could see `PricingCalculator` already have its mutants killed by the existing tests. We looked at the PIT report for both `BookingService` and `SeekerService` and methodically killed the mutations util none were left:  
+![Bild på 100%]()
 
 ### 2. What we found
 When writing the test for bookings exactly 480 minutes, we notice that it failed and the expected result included the 20% surcharge when it shouldn't:
@@ -39,6 +42,18 @@ This means that the provided duration shouldn't be compared equal to the thresho
 
 ```java
 if (booking.getDurationMinutes() > OVERNIGHT_THRESHOLD_MINUTES)
+```
+
+FR-4.4 rule 2 says a booking is accepted only if active bookings is less than the tier max. So it must be rejected at exactly the max. Inside `BookingService` we noticed that the boundary condition was wrong and checked only when active bookings is greater than the tier max instead of at the max or less:
+
+```java
+if (seekerActive > seeker.getMaxConcurrentBookings())
+```
+
+A new seeker with one active booking could book again, when it should be rejected:
+
+```java
+if (seekerActive >= seeker.getMaxConcurrentBookings())
 ```
 
 ### 3. AI use (be honest — it doesn't lower your grade)
