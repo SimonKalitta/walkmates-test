@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Lab 2, Part A — structural testing for {@link PricingCalculator} (FR-4.3).
@@ -48,4 +49,56 @@ class PricingCalculatorStructuralTest {
     // TODO (branch): a clearly-overnight booking (e.g. 600 min) includes the 20% surcharge.
     // TODO (BOUNDARY — this is the interesting one): a booking of exactly 480 minutes must NOT
     //      be surcharged (FR-4.3 says strictly > 480). Write this test and see what happens.
+
+    @Test
+    @DisplayName("SHELTER_VOLUNTEER should should always be free = 0.00")
+    void shelterVolunteerPrice() {
+        Booking booking = new Booking("seeker-1", "listing-1", 60);
+
+        double price = pricing.priceFor(booking, listing(ListingType.SHELTER_VOLUNTEER), seeker(TrustTier.VERIFIED));
+
+        assertThat(price).isEqualTo(0.00);
+    }
+
+    @Test
+    @DisplayName("Overnight bookings includes the 20% surcharge, 80 base * overnight + 12% fee + 20% surcharge = 1075.20")
+    void overnightBookingSurcharge() {
+        Booking booking = new Booking("seeker-1", "listing-1", 600);
+
+        double price = pricing.priceFor(booking, listing(ListingType.DOG_WALK), seeker(TrustTier.VERIFIED));
+
+        assertThat(price).isEqualTo(1075.20);
+    }
+
+    @Test
+    @DisplayName("Bookings for exactly 480 minutes should not include the 20% surcharge FR-4.3, 80 base + 12% fee = 716.80")
+    void bookingExactly480MinutesNoSurcharge() {
+        Booking booking = new Booking("seeker-1", "listing-1", 480);
+
+        double price = pricing.priceFor(booking, listing(ListingType.DOG_WALK), seeker(TrustTier.VERIFIED));
+
+        assertThat(price).isEqualTo(716.80);
+    }
+
+    @Test
+    @DisplayName("Null argument check for priceFor method")
+    void nullCheckBooking() {
+        assertThrows(IllegalArgumentException.class, () -> pricing.priceFor(null, listing(ListingType.DOG_WALK), seeker(TrustTier.VERIFIED)));
+    }
+
+    @Test
+    @DisplayName("Null argument check for priceFor method")
+    void nullCheckListing() {
+        Booking booking = new Booking("seeker-1", "listing-1", 480);
+
+        assertThrows(IllegalArgumentException.class, () -> pricing.priceFor(booking, null, seeker(TrustTier.VERIFIED)));
+    }
+
+    @Test
+    @DisplayName("Null argument check for priceFor method")
+    void nullCheckSeeker() {
+        Booking booking = new Booking("seeker-1", "listing-1", 480);
+
+        assertThrows(IllegalArgumentException.class, () -> pricing.priceFor(booking, listing(ListingType.DOG_WALK), null));
+    }
 }
