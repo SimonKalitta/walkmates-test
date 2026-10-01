@@ -1,10 +1,8 @@
 # Lab Reflection — WalkMates
 
 **Lab:** 2  
-**Pair:** Simon Kalitta (sika2400), Kiryl Yasny (kiya2400)  
-
-# Update commits
-**Repo commit/tag:** [https://github.com/SimonKalitta/walkmates-test/commits/main/](https://github.com/SimonKalitta/walkmates-test/commits/main/), commits `8820add` to `c0f1e5b`.
+**Pair:** Simon Kalitta (sika2400), Kiryl Yasny (kiya2400)
+**Repo commit/tag:** [https://github.com/SimonKalitta/walkmates-test/commits/main/](https://github.com/SimonKalitta/walkmates-test/commits/main/), commit `4a783eb`.
 
 ---
 
@@ -60,14 +58,16 @@ if (seekerActive >= seeker.getMaxConcurrentBookings())
 
 #### Regression selection
 
-With the new functionality it is crucial to ensure that we do not break existing code. The new feature introduces changes to the pricing policy which means it is important to verify that the pricing logic remains correct. Therefore, tests like `BookingServiceTest::checkSufficientSeekerBalance` and `BookingServiceTest::checkInsufficientSeekerBalance` are the most critical to run. Furthermore, a new version of both tests must be implemented to account for weekend bookings as the existing test suite does not cover this scenario. Ideally, a few new tests should be added to cover different _edge cases_ and ensure the new logic works as intended. Tests that check logic that is not affected by the change (e.g., throwing exceptions for unknown seekers, unknown listings, etc) are the lowest priority and do not need to be run every time.
+With the new functionality it is crucial to ensure that we do not break existing code. The new feature introduces changes to the pricing policy which means it is important to verify that the pricing logic remains correct. Therefore, tests like `BookingServiceTest::checkSufficientSeekerBalance` and `BookingServiceTest::checkInsufficientSeekerBalance` are the most critical to run. Tests that check logic that is not affected by the change (e.g., throwing exceptions for unknown seekers, unknown listings, etc) are the lowest priority and do not need to be run every time., no
 
 ### 3. AI use (be honest — it doesn't lower your grade)
 
-AI tools were not used for this assignment as the previous knowledge and the instructions made it unnecessary. We are already familiar with Mockito from the previous course, and there were no problems or questions that would require help from AI.
+AI tools were barely used for this assignment as the previous knowledge and the instructions made it somewhat unnecessary. We are already familiar with Mockito from previous course, and there were no major problems or questions that would require help from AI. AI was used for two tests to help understand why our test didn't cover two mutations. A missing `when()` and a missing `assertThat()` was recommended by _Claude_ that we didn't notice.
 
 ### 4. Judgment
 
-As mentioned above, no AI tools were used for this assignment. Therefore, humans made all decisions.
+As mentioned above, almost no AI tools were used for this assignment so we made all decisions ourselves. 
 
 ### 5. What we'd test next
+
+A new version of both tests must be implemented to account for weekend bookings as the existing test suite does not cover this scenario. Ideally, a few new tests should be added to cover different _edge cases_ and ensure the new logic works as intended.
