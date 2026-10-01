@@ -78,8 +78,8 @@ public class SeekerServiceTest {
     }
 
     @Test
-    @DisplayName("Test seeker service top up exception blocks below code")
-    void testSeekerServiceTopUpExceptionBlocksBelowCode() throws PaymentService.PaymentException {
+    @DisplayName("Test seeker service top up timeout blocks below code")
+    void testSeekerServiceTopUpTimeoutBlocksBelowCode() throws PaymentService.PaymentException {
         Seeker seeker = new Seeker(email, name, phoneNumber);
         Seeker spySeeker = spy(seeker);
         String seekerId = seeker.getId();
@@ -90,6 +90,23 @@ public class SeekerServiceTest {
         when(paymentService.charge(any(String.class), any(String.class), any(Double.class))).thenThrow(PaymentService.PaymentTimeoutException.class);
 
         assertThatThrownBy(() -> seekerService.topUp(seekerId, paymentMethod, amount)).isInstanceOf(PaymentService.PaymentTimeoutException.class);
+
+        verify(spySeeker, never()).addFunds(amount);
+    }
+
+    @Test
+    @DisplayName("Test seeker service top up decline blocks below code")
+    void testSeekerServiceTopUpDeclineBlocksBelowCode() throws PaymentService.PaymentException {
+        Seeker seeker = new Seeker(email, name, phoneNumber);
+        Seeker spySeeker = spy(seeker);
+        String seekerId = seeker.getId();
+        String paymentMethod = "";
+        double amount = 10d;
+
+        when(seekerRepository.findById(any(String.class))).thenReturn(Optional.of(spySeeker));
+        when(paymentService.charge(any(String.class), any(String.class), any(Double.class))).thenThrow(PaymentService.PaymentException.class);
+
+        assertThatThrownBy(() -> seekerService.topUp(seekerId, paymentMethod, amount)).isInstanceOf(PaymentService.PaymentException.class);
 
         verify(spySeeker, never()).addFunds(amount);
     }

@@ -9,6 +9,7 @@
 ---
 
 ### 1. What we did
+
 We raised branch coverage to 100% for `PricingCalculator` by adding tests for shelter volunteer listings always should be free, overnight bookings should include a 20% surcharge, and bookings exactly 480 minutes shouldn't include the 20% surcharge (FR-4.3). The provided test already covered a non-overnight booking. 
 
 Before:  
@@ -17,10 +18,11 @@ Before:
 After:  
 ![](2026-09-30_07-35-14.png)
 
-Mutation tests were also performed. We tested `BookingService` in isolation with Mockito mocks for the repositories and `NotificationService`, and verified the confirmation notification. First time running PIT we could see `PricingCalculator` already have its mutants killed by the existing tests. We looked at the PIT report for both `BookingService` and `SeekerService` and methodically killed the mutations util none were left:  
+Mutation tests were also performed. We tested `BookingService` and `SeekerService` in isolation with _Mockito_ mocks for the repositories and services. We verified that the confirmation notification is sent, and tested `SeekerService::topUp` method. First time running PIT we could see `PricingCalculator` already have its mutants killed by the existing tests. We looked at the PIT report for both `BookingService` and `SeekerService` and methodically killed the mutations util none were left:  
 ![Bild på 100%](2026-09-30_13-50-44.png)
 
 ### 2. What we found
+
 When writing the test for bookings exactly 480 minutes, we notice that it failed and the expected result included the 20% surcharge when it shouldn't:
 ```
 AssertionFailedError: 
@@ -56,10 +58,16 @@ A new seeker with one active booking could book again, when it should be rejecte
 if (seekerActive >= seeker.getMaxConcurrentBookings())
 ```
 
+#### Regression selection
+
+With the new functionality it is crucial to ensure that we do not break existing code. The new feature introduces changes to the pricing policy which means it is important to verify that the pricing logic remains correct. Therefore, tests like `BookingServiceTest::checkSufficientSeekerBalance` and `BookingServiceTest::checkInsufficientSeekerBalance` are the most critical to run. Furthermore, a new version of both tests must be implemented to account for weekend bookings as the existing test suite does not cover this scenario. Ideally, a few new tests should be added to cover different _edge cases_ and ensure the new logic works as intended. Tests that check logic that is not affected by the change (e.g., throwing exceptions for unknown seekers, unknown listings, etc) are the lowest priority and do not need to be run every time.
+
 ### 3. AI use (be honest — it doesn't lower your grade)
 
+AI tools were not used for this assignment as the previous knowledge and the instructions made it unnecessary. We are already familiar with Mockito from the previous course, and there were no problems or questions that would require help from AI.
 
 ### 4. Judgment
 
+As mentioned above, no AI tools were used for this assignment. Therefore, humans made all decisions.
 
 ### 5. What we'd test next
