@@ -8,6 +8,7 @@ import com.walkmates.service.ai.MatchExplanationService;
 import com.walkmates.web.MatchController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.matchers.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -64,6 +66,7 @@ class MatchControllerWebTest {
     void explainHasJsonBodyOnSuccess() throws Exception {
         when(seekers.findById("s1")).thenReturn(Optional.of(mock(Seeker.class)));
         when(listings.findById("l1")).thenReturn(Optional.of(mock(Listing.class)));
+        when(matchExplanation.explainMatch(any() , any())).thenReturn("Mock explanation");
 
         mvc.perform(get("/api/match/s1/explain").param("listingId", "l1"))
                 .andExpect(jsonPath("$.seekerId").exists())
