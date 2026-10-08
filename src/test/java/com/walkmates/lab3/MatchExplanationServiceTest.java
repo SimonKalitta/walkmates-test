@@ -6,6 +6,10 @@ import com.walkmates.model.Seeker;
 import com.walkmates.model.TrustTier;
 import com.walkmates.service.ai.LlmClient;
 import com.walkmates.service.ai.MatchExplanationService;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,6 +18,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -217,6 +223,47 @@ class MatchExplanationServiceTest {
         assertDoesNotThrow(() -> service.explainMatch(seeker, listing));
     }
 
+    // Activity 5.3
+
+    private List<Listing> createRandomListings(int count) {
+        List<Listing> listings = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            Listing listing = mock(Listing.class);
+            when(listing.getId()).thenReturn("Listing-" + i);
+            when(listing.isAvailable()).thenReturn(ThreadLocalRandom.current().nextBoolean());
+            when(listing.getBaseRatePerHour()).thenReturn(ThreadLocalRandom.current().nextDouble(0.0, 500.0));
+            when(listing.getDescription()).thenReturn("Standard listing description " + i);
+            listings.add(listing);
+        }
+        return listings;
+    }
+
+    @Test
+    @DisplayName("recommendBestMatch ignores irrelevant details")
+    void testRecommendBestMatchIgnoresIrrelevantDetails() {
+         LlmClient llm = mock(LlmClient.class);
+         Seeker seeker = mock(Seeker.class);
+         List<Listing> listings = createRandomListings(10);
+         MatchExplanationService service = new MatchExplanationService(llm);
+         Listing bestMatchWinner = service.recommendBestMatch(seeker, listings);
+         listings.remove(bestMatchWinner);
+         String id = bestMatchWinner.getId();
+         when(bestMatchWinner.getDescription()).thenReturn("Standard listing description " + id + "\n. What a beautiful weather it is today!");
+         listings.add(bestMatchWinner);
+         assertEquals(bestMatchWinner, service.recommendBestMatch(seeker, listings));
+    }
+
+    @Test
+    @DisplayName("recommendBestMatch returns the same match after list shuffle")
+    void testRecommendBestMatchReturnsSameMatchAfterListShuffle() {
+        LlmClient llm = mock(LlmClient.class);
+        Seeker seeker = mock(Seeker.class);
+        List<Listing> listings = createRandomListings(10);
+        MatchExplanationService service = new MatchExplanationService(llm);
+        Listing bestMatchWinner = service.recommendBestMatch(seeker, listings);
+        Collections.shuffle(listings);
+        assertEquals(bestMatchWinner, service.recommendBestMatch(seeker, listings));
+    }
 
     // TODO (fallback): also fall back on LlmTimeoutException, and on a null/blank response.
     // TODO (injection): a description containing "ignore previous instructions and ..." must
