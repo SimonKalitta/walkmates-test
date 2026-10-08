@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -148,6 +149,72 @@ class MatchExplanationServiceTest {
                 %s
                 """, DATA_START, freeText, DATA_END));
         verify(listing, times(1)).getDescription();
+    }
+
+    // Activity 5.2
+
+    @Test
+    @DisplayName("explainMatch returns deterministic fallback when LlmException occurs")
+    void testExplainMatchReturnsFallbackWhenLlmExceptionOccurs() throws LlmClient.LlmException {
+        LlmClient llm = mock(LlmClient.class);
+        Seeker seeker = mock(Seeker.class);
+        Listing listing = mock(Listing.class);
+        when(llm.complete("")).thenThrow(LlmClient.LlmException.class);
+        MatchExplanationService service = new MatchExplanationService(llm);
+        String explanation = service.explainMatch(seeker, listing);
+        assert explanation.equals("This %s opportunity \"%s\" is a good fit for a %s seeker."
+                .formatted(listing.getType(), listing.getTitle(), seeker.getTrustTier()));
+    }
+
+    @Test
+    @DisplayName("explainMatch returns deterministic fallback when LlmTimeoutException occurs")
+    void testExplainMatchReturnsFallbackWhenLlmTimeoutExceptionOccurs() throws LlmClient.LlmException {
+        LlmClient llm = mock(LlmClient.class);
+        Seeker seeker = mock(Seeker.class);
+        Listing listing = mock(Listing.class);
+        when(llm.complete("")).thenThrow(LlmClient.LlmTimeoutException.class);
+        MatchExplanationService service = new MatchExplanationService(llm);
+        String explanation = service.explainMatch(seeker, listing);
+        assert explanation.equals("This %s opportunity \"%s\" is a good fit for a %s seeker."
+                .formatted(listing.getType(), listing.getTitle(), seeker.getTrustTier()));
+    }
+
+    @Test
+    @DisplayName("explainMatch returns deterministic fallback when llm returns null")
+    void testExplainMatchReturnsFallbackWhenLlmReturnsNull() throws LlmClient.LlmException {
+        LlmClient llm = mock(LlmClient.class);
+        Seeker seeker = mock(Seeker.class);
+        Listing listing = mock(Listing.class);
+        when(llm.complete("")).thenReturn(null);
+        MatchExplanationService service = new MatchExplanationService(llm);
+        String explanation = service.explainMatch(seeker, listing);
+        assert explanation.equals("This %s opportunity \"%s\" is a good fit for a %s seeker."
+                .formatted(listing.getType(), listing.getTitle(), seeker.getTrustTier()));
+    }
+
+    @Test
+    @DisplayName("explainMatch returns deterministic fallback when llm returns empty string")
+    void testExplainMatchReturnsFallbackWhenLlmReturnsEmptyString() throws LlmClient.LlmException {
+        LlmClient llm = mock(LlmClient.class);
+        Seeker seeker = mock(Seeker.class);
+        Listing listing = mock(Listing.class);
+        when(llm.complete("")).thenReturn("");
+        MatchExplanationService service = new MatchExplanationService(llm);
+        String explanation = service.explainMatch(seeker, listing);
+        assert explanation.equals("This %s opportunity \"%s\" is a good fit for a %s seeker."
+                .formatted(listing.getType(), listing.getTitle(), seeker.getTrustTier()));
+    }
+
+    @Test
+    @DisplayName("explainMatch does not throws LlmClient exception")
+    void testExplainMatchDoesNotThrowLlmClientException() throws LlmClient.LlmException {
+        LlmClient llm = mock(LlmClient.class);
+        Seeker seeker = mock(Seeker.class);
+        Listing listing = mock(Listing.class);
+        MatchExplanationService service = new MatchExplanationService(llm);
+        when(llm.complete("")).thenThrow(LlmClient.LlmException.class);
+        service.explainMatch(seeker, listing);
+        assertDoesNotThrow(() -> service.explainMatch(seeker, listing));
     }
 
 
