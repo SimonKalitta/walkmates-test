@@ -1,5 +1,7 @@
 package com.walkmates.lab3;
 
+import com.walkmates.model.Listing;
+import com.walkmates.model.Seeker;
 import com.walkmates.repository.ListingRepository;
 import com.walkmates.repository.SeekerRepository;
 import com.walkmates.service.ai.MatchExplanationService;
@@ -13,8 +15,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -44,6 +48,27 @@ class MatchControllerWebTest {
 
         mvc.perform(get("/api/match/missing/explain").param("listingId", "l1"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("GET explain returns 200 on success")
+    void explainReturns200OnSuccess() throws Exception {
+        when(seekers.findById("s1")).thenReturn(Optional.of(mock(Seeker.class)));
+        when(listings.findById("l1")).thenReturn(Optional.of(mock(Listing.class)));
+
+        mvc.perform(get("/api/match/s1/explain").param("listingId", "l1")).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("GET explain has a JSON body on success")
+    void explainHasJsonBodyOnSuccess() throws Exception {
+        when(seekers.findById("s1")).thenReturn(Optional.of(mock(Seeker.class)));
+        when(listings.findById("l1")).thenReturn(Optional.of(mock(Listing.class)));
+
+        mvc.perform(get("/api/match/s1/explain").param("listingId", "l1"))
+                .andExpect(jsonPath("$.seekerId").exists())
+                .andExpect(jsonPath("$.listingId").exists())
+                .andExpect(jsonPath("$.explanation").exists());
     }
 
     // TODO: stub a seeker + listing and a canned explanation, assert 200 + JSON body.
